@@ -1,0 +1,18 @@
+plugins:
+  node-shell:
+    enable: true
+    shortCut: s
+    confirm: false
+    description: "Node shell (2-step)"
+    scopes:
+      - node
+    command: sh
+    args:
+      - -c
+      - |
+        kubectl config use-context $CONTEXT
+        kubectl debug node/$NAME --image=alpine --tty --stdin --attach=false -- sleep 3600
+        POD=$(kubectl get pod -n default -o name | grep $NAME | grep node-debugger | head -1)
+        sleep 3
+        kubectl exec -it $POD -n default -- chroot /host
+        kubectl delete $POD -n default --wait=false
