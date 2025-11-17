@@ -1,0 +1,18 @@
+plugins:
+  log-with-less:
+    enable: true
+    shortCut: x
+    scopes:
+      - po
+    command: sh
+    args:
+      - -c
+      - |
+        kubectl config use-context $CONTEXT
+        for c in $(kubectl get pod $NAME -n $NAMESPACE -o jsonpath='{.spec.containers[*].name}');
+        do
+          echo "===== $c ====="
+          kubectl logs pod/$NAME -c $c -n $NAMESPACE --tail 5000 | less -R
+          echo
+        done
+    description: "View pod logs with less"
